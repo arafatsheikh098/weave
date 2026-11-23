@@ -1,0 +1,23 @@
+{
+  "name": "weave",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Real-time collaborative LaTeX and Markdown editor on a CRDT written from scratch.",
+  "license": "MIT",
+  "type": "module",
+  "workspaces": ["packages/*", "apps/server", "apps/web"],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "tsc -b packages/crdt packages/protocol apps/server && npm run typecheck -w apps/web",
+    "lint": "oxlint packages apps/server/src apps/web/src apps/compile/src",
+    "test": "vitest run",
+    "bench": "npm run bench -w packages/crdt"
+  },
+  "devDependencies": {
+    "oxlint": "^1.90.0",
+    "typescript": "~7.0.2",
+    "vitest": "^5.1.1",
+    "@types/node": "^24.0.0"
+  },
+  "engines": { "node": ">=22" }
+}
