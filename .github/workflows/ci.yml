@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: weave
+          POSTGRES_PASSWORD: weave
+          POSTGRES_DB: weave
+        ports: ["5434:5432"]
+        options: >-
+          --health-cmd "pg_isready -U weave" --health-interval 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Type-check (and build the shared packages)
+        run: npm run typecheck
+      - name: Tests (CRDT property tests, server integration tests, web)
+        run: npm test
+      - name: CRDT benchmark (100k keystrokes)
+        run: npm run bench
+      - name: Build web app
+        run: npm run build -w @weave/web
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env
+      - name: Build all images (compile image pre-warms the LaTeX package cache)
+        run: docker compose build

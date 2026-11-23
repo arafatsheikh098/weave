@@ -1,0 +1,17 @@
+# Optional: let the LaTeX compiler download packages that aren't in the pre-warmed cache.
+#   docker compose -f docker-compose.yml -f docker-compose.network.yml up -d
+# This attaches the compile container to a network with internet access and gives its package
+# cache a writable volume (seeded from the image on first use). It still runs --untrusted
+# (no shell-escape), non-root, with a read-only root filesystem; see docs/ARCHITECTURE.md.
+services:
+  compile:
+    environment:
+      COMPILE_ALLOW_NETWORK: "true"
+    volumes: ["tectonic-cache:/home/compiler/.cache/Tectonic"]
+    networks: [compile, egress]
+
+networks:
+  egress: {}
+
+volumes:
+  tectonic-cache:
