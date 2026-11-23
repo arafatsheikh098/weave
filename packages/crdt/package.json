@@ -1,0 +1,19 @@
+{
+  "name": "@weave/crdt",
+  "version": "0.1.0",
+  "description": "A sequence CRDT for collaborative text (FugueMax-equivalent integration), written from scratch.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "bench": "tsc -b && node bench/trace.mjs"
+  }
+}
