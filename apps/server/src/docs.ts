@@ -112,7 +112,8 @@ export class DocStore {
 
   /** Snapshot and drop everything (graceful shutdown). */
   async flushAll(): Promise<void> {
-    for (const fileId of [...this.docs.keys()]) await this.unload(fileId);
+    // Copy the keys first: unload() removes entries while we iterate.
+    for (const fileId of Array.from(this.docs.keys())) await this.unload(fileId);
   }
 
   private async unload(fileId: string): Promise<void> {

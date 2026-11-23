@@ -411,7 +411,10 @@ export async function registerProjects(app: FastifyInstance, s: Services): Promi
       }
       const result = (await res.json()) as { ok?: boolean; error?: string };
       if (!res.ok) throw new HttpError(res.status === 413 ? 413 : 502, result.error ?? "Compile failed.");
-      rooms.broadcast(req.params.id, { t: "compiled", by: user.displayName, ok: !!result.ok });
+      // Tell collaborators about deliberate compiles (not every auto-compile, which would be noisy).
+      if ((req.query as { manual?: string }).manual === "1") {
+        rooms.broadcast(req.params.id, { t: "compiled", by: user.displayName, byUserId: user.id, ok: !!result.ok });
+      }
       return result;
     },
   );

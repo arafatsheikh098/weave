@@ -82,7 +82,7 @@ export type ServerMessage =
   | { t: "peer-left"; session: string }
   | { t: "files"; files: FileMeta[] }
   | { t: "project"; name: string; mainFile: string }
-  | { t: "compiled"; by: string; ok: boolean }
+  | { t: "compiled"; by: string; byUserId: string; ok: boolean }
   | { t: "error"; message: string; file?: string }
   | { t: "pong" };
 
