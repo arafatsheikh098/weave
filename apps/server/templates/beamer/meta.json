@@ -1,0 +1,1 @@
+{ "name": "Beamer slides", "description": "A presentation with title page, outline, blocks, columns and maths.", "kind": "latex", "main": "main.tex", "accent": "orange" }

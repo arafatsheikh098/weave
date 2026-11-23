@@ -1,0 +1,60 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+
+\begin{document}
+
+\title{Real-Time Collaborative Editing Without a Central Lock}
+
+\author{\IEEEauthorblockN{First Author}
+\IEEEauthorblockA{\textit{Dept. of Computer Science and Engineering} \\
+\textit{University of Chittagong}\\
+Chattogram, Bangladesh \\
+first.author@example.com}
+\and
+\IEEEauthorblockN{Second Author}
+\IEEEauthorblockA{\textit{Dept. of Computer Science and Engineering} \\
+\textit{University of Chittagong}\\
+Chattogram, Bangladesh \\
+second.author@example.com}
+}
+
+\maketitle
+
+\begin{abstract}
+We describe a collaborative editor whose document is a sequence CRDT. Concurrent edits from
+any number of users, including users working offline, merge deterministically without
+coordination, and concurrently typed words never interleave.
+\end{abstract}
+
+\begin{IEEEkeywords}
+CRDT, collaborative editing, distributed systems, eventual consistency
+\end{IEEEkeywords}
+
+\section{Introduction}
+Operational transformation requires a central server to order operations~\cite{ellis1989}.
+CRDTs instead guarantee that replicas which have seen the same set of operations hold the same
+state~\cite{shapiro2011}.
+
+\section{Method}
+Each character carries a unique identifier $(a, s)$ where $a$ is the author and $s$ a counter.
+Its position is determined by its left and right origins:
+\begin{equation}
+  \mathrm{pos}(c) = f\bigl(\mathrm{origin}_L(c), \mathrm{origin}_R(c), \mathrm{id}(c)\bigr).
+\end{equation}
+
+\section{Evaluation}
+Replaying a 100{,}000-keystroke trace takes well under a second on a laptop.
+
+\section{Conclusion}
+CRDTs make offline-first collaborative writing practical.
+
+\begin{thebibliography}{00}
+\bibitem{ellis1989} C. A. Ellis and S. J. Gibbs, ``Concurrency control in groupware systems,'' in \textit{Proc. ACM SIGMOD}, 1989, pp. 399--407.
+\bibitem{shapiro2011} M. Shapiro, N. Pregui\c{c}a, C. Baquero, and M. Zawirski, ``Conflict-free replicated data types,'' in \textit{Proc. SSS}, 2011, pp. 386--400.
+\end{thebibliography}
+
+\end{document}

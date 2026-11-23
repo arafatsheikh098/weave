@@ -1,0 +1,1 @@
+{ "name": "CV / résumé", "description": "A one-page résumé with sections for education, experience, projects and skills.", "kind": "latex", "main": "main.tex", "accent": "green" }

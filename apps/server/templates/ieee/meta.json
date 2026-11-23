@@ -1,0 +1,1 @@
+{ "name": "IEEE conference paper", "description": "Two-column IEEEtran paper with abstract, keywords, equations, figure and IEEE-style references.", "kind": "latex", "main": "main.tex", "accent": "violet" }

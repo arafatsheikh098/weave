@@ -1,0 +1,43 @@
+\documentclass[10.5pt,a4paper]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{accent}{RGB}{42,120,214}
+\titleformat{\section}{\large\bfseries\color{accent}}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{10pt}{6pt}
+\setlist[itemize]{leftmargin=1.2em, itemsep=1pt, topsep=2pt}
+\pagestyle{empty}
+
+\newcommand{\entry}[4]{\textbf{#1} \hfill #2 \\ \textit{#3} \hfill \textit{#4}\\[-2pt]}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries Your Name}\\[4pt]
+  Chattogram, Bangladesh \quad$\cdot$\quad you@example.com \quad$\cdot$\quad
+  \href{https://github.com/yourname}{github.com/yourname}
+\end{center}
+
+\section{Education}
+\entry{University of Chittagong}{2022 -- present}{B.Sc. in Computer Science and Engineering}{Chattogram}
+
+\section{Experience}
+\entry{Data Annotation Intern}{Apr 2026 -- present}{BDAI -- HEAT Sub-project}{On-site}
+\begin{itemize}
+  \item Curated and pre-processed large image datasets for machine-learning projects.
+\end{itemize}
+
+\section{Projects}
+\entry{Weave}{2026}{Real-time collaborative LaTeX editor on a hand-written CRDT}{TypeScript, Node.js, React}
+\begin{itemize}
+  \item Offline-first editing that merges automatically; live PDF compile in a sandbox.
+\end{itemize}
+
+\section{Skills}
+\textbf{Languages:} C/C++, Python, TypeScript, SQL \quad
+\textbf{Tools:} React, FastAPI, PostgreSQL, Docker, Git
+
+\end{document}

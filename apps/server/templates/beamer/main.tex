@@ -1,0 +1,53 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage{amsmath}
+
+\title{Collaborative Writing with CRDTs}
+\subtitle{A short talk}
+\author{Your Name}
+\institute{University of Chittagong}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+\end{frame}
+
+\section{Problem}
+\begin{frame}{Why is collaborative editing hard?}
+  \begin{itemize}
+    \item Two people type at the same place at the same time
+    \item Someone edits offline on a bus
+    \item The network delivers messages out of order
+  \end{itemize}
+  \begin{block}{Goal}
+    Everyone ends up with the same document, without losing anyone's work.
+  \end{block}
+\end{frame}
+
+\section{Idea}
+\begin{frame}{Give every character an identity}
+  \begin{columns}
+    \column{0.5\textwidth}
+      Each character remembers its left and right neighbours when it was typed.
+    \column{0.5\textwidth}
+      \[
+        c = (\text{author}, \text{counter}, \text{origin}_L, \text{origin}_R)
+      \]
+  \end{columns}
+  \begin{alertblock}{Result}
+    Concurrent insertions are ordered deterministically and never interleave.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{Thank you}
+  \centering \Large Questions?
+\end{frame}
+
+\end{document}

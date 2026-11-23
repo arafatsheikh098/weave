@@ -1,0 +1,1 @@
+{ "name": "Markdown notes", "description": "Shared meeting notes or a README in Markdown with a live preview.", "kind": "markdown", "main": "notes.md", "accent": "aqua" }

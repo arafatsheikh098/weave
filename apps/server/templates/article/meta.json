@@ -1,0 +1,1 @@
+{ "name": "Article", "description": "A clean article with sections, maths, a table, a figure and a bibliography.", "kind": "latex", "main": "main.tex", "accent": "blue" }

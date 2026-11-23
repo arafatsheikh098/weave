@@ -1,0 +1,54 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
+
+\title{Writing Together with Weave}
+\author{Your Name \\ \small University of Chittagong}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This is a starter article. Everyone invited to the project can edit it at the same time,
+even offline; changes merge automatically when you reconnect.
+\end{abstract}
+
+\section{Introduction}
+Weave keeps every collaborator's edits in a conflict-free replicated data type
+(CRDT)~\cite{shapiro2011crdt}, so there is no central lock and no ``someone else is editing''
+dialog.
+
+\section{Some mathematics}
+The probability of solving a problem of rating $r$ for a user of rating $R$ is
+\begin{equation}
+  P(\text{solve}) = \frac{1}{1 + 10^{(r - R)/400}}.
+  \label{eq:elo}
+\end{equation}
+Equation~\eqref{eq:elo} is the Elo curve.
+
+\section{A table}
+\begin{table}[h]
+  \centering
+  \begin{tabular}{lrr}
+    \toprule
+    Algorithm & Interleaving & Complexity \\
+    \midrule
+    RGA  & backward only & $O(n)$ per op \\
+    YATA & rare          & $O(n)$ per op \\
+    Fugue & none         & $O(\log n)$ per op \\
+    \bottomrule
+  \end{tabular}
+  \caption{Sequence CRDTs at a glance.}
+\end{table}
+
+\section{Conclusion}
+Press \textbf{Ctrl/Cmd + S} to compile, and share the project from the top bar.
+
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{document}
