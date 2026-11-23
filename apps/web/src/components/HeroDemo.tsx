@@ -57,15 +57,19 @@ export function HeroDemo() {
       let aPos = BASE.indexOf("@A") - 2;
       let bOffline = false;
       const outboxB: Op[] = [];
-      // Where Rahim's cursor is in Ayesha's copy: after the last of his characters that has arrived.
-      let lastBAnchor = docB.anchorAt(bPos);
+      // Rahim's cursor in Ayesha's copy: just after the last of his characters that has arrived.
+      const bInA = () => {
+        for (let k = bPos; k >= 0; k--) {
+          const anchor = docB.anchorAt(k);
+          if (!anchor.id || docA.positionOf(anchor.id) !== null) return docA.resolveAnchor(anchor);
+        }
+        return 0;
+      };
       const show = () => {
-        const bAnchor = docB.anchorAt(bPos);
-        if (!bAnchor.id || docA.positionOf(bAnchor.id) !== null) lastBAnchor = bAnchor;
         setFrame({
           text: docA.toString(),
           a: aPos,
-          b: docA.resolveAnchor(lastBAnchor),
+          b: bInA(),
           bOffline,
           queued: outboxB.length,
           converged: docA.toString() === docB.toString(),
@@ -149,7 +153,7 @@ export function HeroDemo() {
         <Badge name={RAHIM.name} color={RAHIM.color} offline={frame?.bOffline} queued={frame?.queued ?? 0} />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-[1.25fr_1fr]">
-        <pre className="h-[300px] overflow-hidden whitespace-pre-wrap bg-[var(--editor-bg)] p-4 font-mono text-[12.5px] leading-[1.65] text-ink">
+        <pre className="relative z-10 h-[300px] overflow-visible whitespace-pre-wrap bg-[var(--editor-bg)] p-4 font-mono text-[12.5px] leading-[1.65] text-ink">
           {frame ? <Highlighted text={frame.text} a={frame.a} b={frame.b} /> : BASE.replace("@A", "").replace("@B", "")}
         </pre>
         <div className="hidden border-l border-line bg-surface-2 p-4 sm:block">
@@ -188,7 +192,7 @@ function Badge({ name, color, offline, queued = 0 }: { name: string; color: stri
 
 function Caret({ color, name }: { color: string; name: string }) {
   return (
-    <span className="remote-caret demo-caret" style={{ ["--peer" as string]: color }} data-name={name}>
+    <span className="remote-caret" style={{ ["--peer" as string]: color }} data-name={name}>
       {"​"}
     </span>
   );
