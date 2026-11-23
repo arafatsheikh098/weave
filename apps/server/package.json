@@ -1,0 +1,30 @@
+{
+  "name": "@weave/server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Weave collaboration server: auth, projects, WebSocket rooms, persistence.",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/main.js"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "@types/ws": "^8.18.2",
+    "tsx": "^4.23.15"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.0",
+    "@fastify/multipart": "^9.0.0",
+    "@fastify/rate-limit": "^10.0.0",
+    "@fastify/websocket": "^11.0.0",
+    "@node-rs/argon2": "^2.0.0",
+    "@weave/crdt": "0.1.0",
+    "@weave/protocol": "0.1.0",
+    "fastify": "^5.0.0",
+    "jose": "^6.0.0",
+    "pg": "^8.13.0",
+    "zod": "^4.1.0"
+  }
+}
