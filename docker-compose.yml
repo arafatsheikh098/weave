@@ -1,0 +1,60 @@
+name: weave
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: weave
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-weave}
+      POSTGRES_DB: weave
+    # Published on localhost only, for development and tests.
+    ports: ["127.0.0.1:5434:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weave"]
+      interval: 3s
+      retries: 20
+    networks: [backend]
+
+  server:
+    build: { context: ., dockerfile: apps/server/Dockerfile }
+    environment:
+      DATABASE_URL: postgres://weave:${POSTGRES_PASSWORD:-weave}@db:5432/weave
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      COMPILE_URL: http://compile:7000
+      NODE_ENV: production
+    depends_on:
+      db: { condition: service_healthy }
+      compile: { condition: service_started }
+    ports: ["8001:8001"]
+    networks: [backend, compile]
+
+  # LaTeX compiler sandbox: non-root, read-only root filesystem, no capabilities, memory/CPU/PID
+  # limits, and attached only to an internal network with no route to the internet.
+  compile:
+    build: { context: ., dockerfile: apps/compile/Dockerfile }
+    environment:
+      COMPILE_ALLOW_NETWORK: ${COMPILE_ALLOW_NETWORK:-false}
+    read_only: true
+    tmpfs: ["/tmp:size=512m"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 1g
+    cpus: 2
+    pids_limit: 128
+    networks: [compile]
+
+  web:
+    build: { context: ., dockerfile: apps/web/Dockerfile }
+    depends_on: [server]
+    ports: ["8081:80"]
+    networks: [backend]
+
+networks:
+  backend: {}
+  compile:
+    internal: true
+
+volumes:
+  pgdata:
