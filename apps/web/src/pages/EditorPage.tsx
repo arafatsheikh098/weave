@@ -41,6 +41,9 @@ import { useAuth } from "../lib/auth";
 import { modKey, useMediaQuery } from "../lib/motion";
 import { useTheme } from "../lib/theme";
 import { ProjectConnection, type FileReplica } from "../sync/connection";
+import { get as idbGet, set as idbSet } from "idb-keyval";
+
+const pdfKey = (projectId: string) => `weave:pdf:${projectId}`;
 
 const TOUR: TourStep[] = [
   { target: "files", title: "Your project files", body: "Open .tex, .bib and Markdown files here. Drag images in to upload them." },
@@ -177,6 +180,8 @@ export function EditorPage() {
       try {
         const result = await api.compile(id, manual);
         setCompile((c) => ({ phase: "done", result, pdf: result.pdf ?? c.pdf, at: Date.now(), error: null }));
+        // Keep the latest good PDF in this browser, so the preview still shows it offline.
+        if (result.pdf) idbSet(pdfKey(id), result.pdf).catch(() => {});
         const errors = result.diagnostics.filter((d) => d.level === "error").length;
         if (tid !== null) {
           if (result.ok) toast.show({ kind: "success", title: "PDF ready", body: result.cached ? "Nothing changed since the last compile." : `Compiled in ${(result.ms / 1000).toFixed(1)} s.` }, { id: tid });
@@ -190,6 +195,19 @@ export function EditorPage() {
     },
     [conn, id, isLatex, toast],
   );
+  // Show the last saved PDF straight away (it is replaced as soon as a fresh compile finishes).
+  useEffect(() => {
+    let alive = true;
+    idbGet<string>(pdfKey(id))
+      .then((saved) => {
+        if (alive && saved) setCompile((c) => (c.pdf ? c : { ...c, pdf: saved }));
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+
   const runCompileRef = useRef(runCompile);
   runCompileRef.current = runCompile;
 
