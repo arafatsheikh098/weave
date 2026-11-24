@@ -238,6 +238,8 @@ export async function registerProjects(app: FastifyInstance, s: Services): Promi
     if (!f) throw new HttpError(404, "File not found.");
     reply.header("Cache-Control", "private, max-age=60");
     reply.header("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+    // The stored type comes from the uploader; never let the browser guess a different one.
+    reply.header("X-Content-Type-Options", "nosniff");
     if (f.kind === "binary") return reply.type(f.mime ?? "application/octet-stream").send(f.data);
     return reply.type("text/plain; charset=utf-8").send(await store.text(req.params.fileId));
   });
