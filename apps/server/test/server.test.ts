@@ -291,6 +291,28 @@ describe("collaboration", () => {
     expect(code).toBe(4004);
   });
 
+  it("blocks cross-site requests and WebSocket handshakes", async () => {
+    const evil = { cookie: owner.cookie, origin: "https://evil.example", "content-type": "application/json" };
+    const del = await fetch(`${url}/api/projects/${projectId}`, { method: "DELETE", headers: evil });
+    expect(del.status).toBe(403);
+    const ws = new WebSocket(`${url.replace("http", "ws")}/api/projects/${projectId}/ws`, {
+      headers: { cookie: owner.cookie, origin: "https://evil.example" },
+    });
+    const code = await new Promise((r) => ws.on("close", (c) => r(c)));
+    expect(code).toBe(4003);
+    // The real app (same origin) is still allowed.
+    const same = new URL(url).host;
+    const ok = await fetch(`${url}/api/projects/${projectId}`, { headers: { cookie: owner.cookie, origin: `http://${same}` } });
+    expect(ok.status).toBe(200);
+  });
+
+  it("serves uploads with nosniff and a sandbox policy", async () => {
+    const { json } = await owner.req<{ files: { id: string; path: string }[] }>("GET", `/api/projects/${projectId}`);
+    const res = await fetch(`${url}/api/projects/${projectId}/files/${json.files[0]!.id}/raw`, { headers: { cookie: owner.cookie } });
+    expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(res.headers.get("content-security-policy")).toContain("sandbox");
+  });
+
   it("rejects malformed and oversized messages", async () => {
     const a = new Editor(owner, projectId, mainId);
     await a.open();
