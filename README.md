@@ -19,6 +19,8 @@ binding**, and compiles real LaTeX in a **sandboxed Tectonic** container.
   - Keep typing with no connection; edits are stored in IndexedDB.
   - The status bar shows "Offline · N unsynced edits".
   - Everything merges on reconnect.
+  - A service worker caches the app, so Weave also **opens with no network**: projects you've
+    visited load from this browser, including the last compiled PDF.
 - **No interleaving:** if two people type at the same spot, their words stay whole. Ordering
   follows FugueMax ([docs/CRDT.md](docs/CRDT.md)).
 - **LaTeX to PDF:**
