@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import { api, type User } from "./api";
+import { api, clearOfflineCache, type User } from "./api";
 
 interface AuthState {
   user: User | null;
@@ -22,6 +22,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
   const logout = useCallback(async () => {
     await api.logout().catch(() => {});
+    // Offline copies (documents, project lists) belong to this account; don't leave them behind.
+    await clearOfflineCache();
     setUser(null);
   }, []);
   return <AuthContext.Provider value={{ user, loading, setUser, logout }}>{children}</AuthContext.Provider>;

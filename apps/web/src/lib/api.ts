@@ -1,4 +1,5 @@
 import type { FileMeta, Role } from "@weave/protocol";
+import { del, get, keys, set } from "idb-keyval";
 
 export interface User {
   id: string;
@@ -99,17 +100,58 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   return data as T;
 }
 
+/**
+ * A GET whose last successful response is kept in IndexedDB. When the network is unreachable the
+ * saved copy is returned instead, so the dashboard and editor can open offline.
+ */
+async function cachedGet<T>(path: string): Promise<T> {
+  const key = `weave:api:${path}`;
+  try {
+    const data = await request<T>("GET", path);
+    set(key, data).catch(() => {});
+    return data;
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 0) {
+      const saved = await get<T>(key).catch(() => undefined);
+      if (saved !== undefined) return saved;
+    }
+    if (e instanceof ApiError && (e.status === 401 || e.status === 403 || e.status === 404)) {
+      del(key).catch(() => {});
+    }
+    throw e;
+  }
+}
+
+/**
+ * On logout, forget offline copies so the next person on this browser doesn't see them.
+ * Documents that still have unsynced edits are kept, so signing out never loses work; they sync
+ * the next time their owner opens the project.
+ */
+export async function clearOfflineCache(): Promise<void> {
+  const all = await keys().catch(() => [] as IDBValidKey[]);
+  await Promise.all(
+    all.map(async (k) => {
+      const key = String(k);
+      if (key.startsWith("weave:api:") || key.startsWith("weave:pdf:")) return del(k);
+      if (key.startsWith("weave:file:")) {
+        const saved = await get<{ outbox?: unknown[] }>(k).catch(() => undefined);
+        if (!saved?.outbox?.length) return del(k);
+      }
+    }),
+  ).catch(() => {});
+}
+
 export const api = {
-  me: () => request<User>("GET", "/auth/me"),
+  me: () => cachedGet<User>("/auth/me"),
   login: (username: string, password: string) => request<User>("POST", "/auth/login", { username, password }),
   register: (username: string, password: string, displayName: string) =>
     request<User>("POST", "/auth/register", { username, password, displayName }),
   logout: () => request<void>("POST", "/auth/logout"),
 
   templates: () => request<TemplateInfo[]>("GET", "/templates"),
-  projects: () => request<ProjectSummary[]>("GET", "/projects"),
+  projects: () => cachedGet<ProjectSummary[]>("/projects"),
   createProject: (name: string, template: string) => request<{ id: string }>("POST", "/projects", { name, template }),
-  project: (id: string) => request<Project>("GET", `/projects/${id}`),
+  project: (id: string) => cachedGet<Project>(`/projects/${id}`),
   updateProject: (id: string, patch: { name?: string; mainFile?: string }) => request("PATCH", `/projects/${id}`, patch),
   deleteProject: (id: string) => request<void>("DELETE", `/projects/${id}`),
 
